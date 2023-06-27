@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'css/body.css' %}">
+    <title>Données</title>
+</head>
+<body>
+    <a href="/appsae24/accueil">Retour à l'accueil</a>
+        <h1>Données:</h1>
+    <form action="/appsae24/liste_donnees/" method="get">
+        <label for="capteur_id">ID du capteur:</label>
+        <input type="text" id="capteur_id" name="capteur_id">
+
+        <label for="start_date">Date de début:</label>
+        <input type="text" id="start_date" name="start_date" placeholder="jj/mm/aaaa">
+
+        <label for="end_date">Date de fin:</label>
+        <input type="text" id="end_date" name="end_date" placeholder="jj/mm/aaaa">
+
+        <input type="submit" value="Filtrer">
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Degré</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in data %}
+            <tr>
+                <td>{{ d.capteur.IDs }}</td>
+                <td>{{ d.timestamp }}</td>
+                <td>{{ d.degre }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</body>
+</html>

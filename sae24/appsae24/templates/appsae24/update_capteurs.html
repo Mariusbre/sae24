@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+        <link rel="stylesheet" href="{% static 'css/body.css' %}">
+    <title>Capteurs</title>
+</head>
+<body>
+<p class="main">Mise à jour de la film</p>
+
+
+    <form method="post" action="/appsae24/update_traitement/{{IDs}}/">
+        {% csrf_token %}
+        {{ form.as_ul }}
+        <input type="submit" value="✔">
+    </form>
+</body>
+</html>

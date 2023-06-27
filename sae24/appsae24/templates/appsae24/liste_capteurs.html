@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'css/body.css' %}">
+    <title>Capteurs</title>
+</head>
+<body>
+    <a href="/appsae24/accueil">Retour à l'accueil</a>
+    <h1> Capteurs:</h1>
+{% for l in liste_c %}
+    <li> {{l}} </li>        <button><a href="/appsae24/update/{{l.IDs}}/">⚙️</a></button>
+
+{% endfor %}
+</body>
+</html>
