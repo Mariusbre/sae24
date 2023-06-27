@@ -23,38 +23,6 @@ while not connected:
         time.sleep(2)
 
 cursor = db.cursor()
-cursor.execute("""
-SELECT 1 FROM capteurs LIMIT 1
-""")
-existe_pas = cursor.fetchone() is None
-
-if existe_pas:
-    cursor = db.cursor()
-    cursor.execute("CREATE DATABASE grp17")
-    cursor.execute("USE grp17")
-
-    cursor = db.cursor()
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS capteurs (
-        ID VARCHAR(255) NOT NULL,
-        nom_capteur VARCHAR(255),
-        piece VARCHAR(50) NOT NULL,
-        UNIQUE (nom_capteur),
-        PRIMARY KEY (ID))
-    """)
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS donnees (
-        id INT NOT NULL AUTO_INCREMENT,
-        capteur_id VARCHAR(255) NOT NULL,
-        CONSTRAINT capteursFK
-            FOREIGN KEY (capteur_id)
-            REFERENCES capteurs(ID),
-        timestamp DATETIME NOT NULL,
-        degre FLOAT NOT NULL,
-        PRIMARY KEY (id))
-    """)
-
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -65,9 +33,33 @@ def on_connect(client, userdata, flags, rc):
 
 
 def check_id_exists(id):
-    cursor.execute("SELECT ID FROM capteurs WHERE ID = %s", (id,))
+    cursor.execute("SELECT IDs FROM capteurs WHERE IDs = %s", (id,))
     result = cursor.fetchone()
     return result is not None
+
+
+def remove_duplicates():
+    cursor.execute(
+        """
+        CREATE TEMPORARY TABLE temp_duplicates
+        SELECT capteur_id, timestamp, degre
+        FROM donnees
+        GROUP BY capteur_id, timestamp, degre
+        HAVING COUNT(*) > 1
+        """
+    )
+    cursor.execute(
+        """
+        DELETE FROM donnees
+        WHERE (capteur_id, timestamp, degre) IN (
+            SELECT capteur_id, timestamp, degre
+            FROM temp_duplicates
+        )
+        """
+    )
+    cursor.execute("DROP TABLE IF EXISTS temp_duplicates")
+
+    db.commit()
 
 
 def on_message(client, userdata, message):
@@ -78,9 +70,9 @@ def on_message(client, userdata, message):
         values = value.split(',')
         x = random.randint(0, 30)
         id = values[0]
-        id = id.replace("ID=", "")
+        id = id.replace("Id=", "")
         capteur_id = values[0]
-        capteur_id = capteur_id.replace("ID=", "")
+        capteur_id = capteur_id.replace("Id=", "")
         piece = values[1]
         piece = piece.replace("piece=", "")
         date = values[2]
@@ -94,7 +86,7 @@ def on_message(client, userdata, message):
         if id in z or check_id_exists(id):
             c = 4
         else:
-            cursor.execute("INSERT INTO capteurs (id, nom_capteur, piece) VALUES (%s, %s, %s)",
+            cursor.execute("INSERT INTO capteurs (IDs, nom_capteur, piece) VALUES (%s, %s, %s)",
                            (id, nom_capteur, piece))
 
         cursor.execute(
@@ -103,6 +95,7 @@ def on_message(client, userdata, message):
 
         db.commit()
         z.append(id)
+        remove_duplicates()
 
 
 broker_address = "test.mosquitto.org"
