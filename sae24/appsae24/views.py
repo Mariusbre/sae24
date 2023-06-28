@@ -30,7 +30,7 @@ def liste_donnees(request):
     plt.title('Graphique des degrés')
     plt.grid(True)
 
-    plt.show()
+    plt.savefig("graphique.png")
 
     context = {'data': data, 'degre': degre}
     return render(request, 'appsae24/liste_donnees.html', context)
@@ -61,3 +61,5 @@ def update_capteurs(request, IDs):
     capteurs = models.capteurs.objects.get(IDs=IDs)
     form = CapteursForm(instance=capteurs)
     return render(request, "appsae24/update_capteurs.html", {"form": form, "IDs": IDs})
+
+

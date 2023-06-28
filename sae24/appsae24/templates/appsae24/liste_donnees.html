@@ -7,7 +7,9 @@
 </head>
 <body>
     <a href="/appsae24/accueil">Retour à l'accueil</a>
-        <h1>Données:</h1>
+        <h1>Graphique:</h1>
+<img src="{% static 'graphique.png' %}">
+    <h1>Données:</h1>
     <form action="/appsae24/liste_donnees/" method="get">
         <label for="capteur_id">ID du capteur:</label>
         <input type="text" id="capteur_id" name="capteur_id">
